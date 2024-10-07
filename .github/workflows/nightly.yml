@@ -36,6 +36,8 @@ jobs:
       - run: echo '${{ needs.set-up-matrix.outputs.json }}' > versions.json
       - run: echo date=$(jq -r .master.date versions.json) >> $GITHUB_ENV
       - run: ./apply-templates.sh
+      - run: echo base=$(ruby -e 's = File.read("master/${{ matrix.variant }}/Dockerfile"); puts s[/FROM (.*)/, 1]') >> $GITHUB_ENV
+      - run: echo platforms=$(./architectures.rb $base) >> $GITHUB_ENV
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -58,5 +60,5 @@ jobs:
         with:
           context: ./master/${{ matrix.variant }}
           push: true
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/386,linux/ppc64le,linux/s390x
+          platforms: ${{ env.platforms }}
           tags: ${{ env.tag1 }},${{ env.tag2 }}
