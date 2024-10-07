@@ -53,7 +53,7 @@ jobs:
           password: ${{ github.token }}
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         env:
           tag1: ghcr.io/docker-ruby-nightly/ruby:${{ matrix.variant }}-nightly-${{ env.date }}
           tag2: ghcr.io/docker-ruby-nightly/ruby:${{ matrix.variant }}-nightly
