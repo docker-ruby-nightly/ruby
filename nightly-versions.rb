@@ -20,4 +20,8 @@ master.merge!({
   "rust" => donor["rust"],
   "rustup" => donor["rustup"],
 })
-puts JSON.generate({ "master" => master })
+result = { "master" => master }.to_json
+# For step output
+puts result
+# For apply-templates.sh
+File.write("versions.json", result)
