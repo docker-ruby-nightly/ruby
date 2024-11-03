@@ -106,6 +106,8 @@ jobs:
     needs:
       - build
       - set-up-matrix
+    if: success() || failure()
+
     strategy:
       fail-fast: false
       matrix:
