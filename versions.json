@@ -75,7 +75,7 @@
       "alpine3.19"
     ],
     "rust": {
-      "version": "1.82.0"
+      "version": "nightly"
     },
     "rustup": {
       "arches": {
@@ -145,7 +145,7 @@
       "alpine3.19"
     ],
     "rust": {
-      "version": "1.82.0"
+      "version": "nightly"
     },
     "rustup": {
       "arches": {
@@ -222,7 +222,7 @@
       "alpine3.19"
     ],
     "rust": {
-      "version": "1.82.0"
+      "version": "nightly"
     },
     "rustup": {
       "arches": {
