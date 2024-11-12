@@ -11,7 +11,7 @@ on:
     - cron: 0 20 * * *
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 env:
@@ -148,6 +148,26 @@ jobs:
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
 
-      - name: Inspect image
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - set-up-matrix
+      - build
+      - merge
+    if: success() || failure()
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create release notes
         run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
+          cat <<EOT >> notes.txt
+          ${{ needs.build.result != 'success' && 'There were one or more build failures' || '' }}
+
+          See more at https://github.com/docker-ruby-nightly/ruby/pkgs/container/ruby/versions?filters[version_type]=tagged
+          EOT
+
+      - name: Create release
+        if: github.event_name == 'schedule' || inputs.push == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create ${{ needs.set-up-matrix.outputs.date }} --title="${{ needs.set-up-matrix.outputs.date }}" --notes-file=notes.txt
