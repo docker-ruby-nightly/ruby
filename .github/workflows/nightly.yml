@@ -166,8 +166,14 @@ jobs:
           See more at https://github.com/docker-ruby-nightly/ruby/pkgs/container/ruby/versions?filters[version_type]=tagged
           EOT
 
+      - id: latest-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: echo "latest_release=$(gh release list --limit 1 --json name --jq '.[].name')" >> $GITHUB_OUTPUT
+
       - name: Create release
-        if: github.event_name == 'schedule' || inputs.push == true
+        # https://github.com/ruby/actions/actions/workflows/snapshot-master.yml
+        if: (github.event_name == 'schedule' || inputs.push == true) && steps.latest-release.outputs.latest_release != needs.set-up-matrix.outputs.date
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create ${{ needs.set-up-matrix.outputs.date }} --title="${{ needs.set-up-matrix.outputs.date }}" --notes-file=notes.txt
