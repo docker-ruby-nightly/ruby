@@ -58,7 +58,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
 
 # some of ruby's build scripts are written in ruby
 #   we purge system ruby later to make sure our final image uses what we just built
-RUN set -eux; \
+RUN --mount=type=bind,source=ruby.tar.xz,target=ruby.tar.xz \
+	set -eux; \
 	\
 {{ if is_alpine then ( -}}
 	apk add --no-cache --virtual .ruby-builddeps \
@@ -197,12 +198,10 @@ RUN set -eux; \
 	fi; \
 {{ ) else "" end -}}
 	\
-	wget -O ruby.tar.xz "$RUBY_DOWNLOAD_URL"; \
 	echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum --check --strict; \
 	\
 	mkdir -p /usr/src/ruby; \
 	tar -xJf ruby.tar.xz -C /usr/src/ruby --strip-components=1; \
-	rm ruby.tar.xz; \
 	\
 	cd /usr/src/ruby; \
 	\

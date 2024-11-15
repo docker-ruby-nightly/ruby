@@ -11,15 +11,14 @@ uri = URI("https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.json")
 res = Net::HTTP.get_response(uri)
 raise StandardError, "Got status code #{res.code}: #{res.body}" unless res.code == "200"
 
-master = JSON.parse(res.body).first
-master["url"] = master["filename"].transform_values { |file| "https://cache.ruby-lang.org/pub/ruby/snapshot/#{file}" }
-master.delete("filename")
-master.merge!({
+upstream = JSON.parse(res.body).first
+master = donor.slice("variants", "rust", "rustup")
+master.merge!(
   "version" => "master",
-  "variants" => donor["variants"],
-  "rust" => donor["rust"],
-  "rustup" => donor["rustup"],
-})
+  "date" => upstream["date"],
+  "url" => { "xz" => "file://#{ENV["GITHUB_WORKSPACE"]}/ruby.tar.xz" },
+  "sha256" => { "xz" => upstream["sha256"]["xz"] },
+)
 result = { "master" => master }.to_json
 # For step output
 puts result
