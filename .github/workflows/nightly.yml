@@ -102,15 +102,26 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
 
       # linux/amd64 => linux-amd64
-      - run: |
+      - if: always()
+        run: |
           platform=${{ matrix.image.platform }}
-          echo "platform_safe=${platform//\//-}" >> $GITHUB_ENV
+          platform_safe=${platform//\//-}
+          echo "platform_safe=$platform_safe" >> $GITHUB_ENV
+          echo "${{ steps.build.outcome == 'success' && '✅' || '❌' }} ${{ matrix.image.variant }}-$platform_safe" > outcome-${{ matrix.image.variant }}-$platform_safe.txt
 
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
           name: digests-${{ matrix.image.variant }}-${{ env.platform_safe }}
           path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload outcome
+        uses: actions/upload-artifact@v4
+        with:
+          name: outcome-${{ matrix.image.variant }}-${{ env.platform_safe }}
+          path: outcome-${{ matrix.image.variant }}-${{ env.platform_safe }}.txt
           if-no-files-found: error
           retention-days: 1
 
@@ -171,17 +182,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Create release notes
-        run: |
-          cat <<EOT >> notes.txt
-          ${{ needs.build.result != 'success' && 'There were one or more build failures' || '' }}
-
-          See more at https://github.com/docker-ruby-nightly/ruby/pkgs/container/ruby/versions?filters[version_type]=tagged
-          EOT
-      
       - uses: actions/download-artifact@v4
         with:
           name: snapshot-master
+      - uses: actions/download-artifact@v4
+        with:
+          path: outcome
+          pattern: outcome-*
+          merge-multiple: true
+
+      - name: Create release notes
+        run: |
+          echo "https://github.com/docker-ruby-nightly/ruby/pkgs/container/ruby/versions?filters[version_type]=tagged" > notes.txt
+          echo "" >> notes.txt
+          cat $(find outcome/* | sort) >> notes.txt
 
       - id: latest-release
         env:
