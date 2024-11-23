@@ -102,7 +102,7 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
 
       # linux/amd64 => linux-amd64
-      - if: always()
+      - if: success() || failure()
         run: |
           platform=${{ matrix.image.platform }}
           platform_safe=${platform//\//-}
@@ -118,6 +118,7 @@ jobs:
           retention-days: 1
 
       - name: Upload outcome
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: outcome-${{ matrix.image.variant }}-${{ env.platform_safe }}
