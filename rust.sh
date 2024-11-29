@@ -77,7 +77,7 @@ done
 
 # TODO https://static.rust-lang.org/dist/channel-rust-1.66.toml -> scrape stable to know which version is stable but we can scrape other minors to get the latest patch if we needed an older one for some reason (like an older version of Ruby needing an older Rust or a newer Rust no longer working on our older distros, etc)
 
-rustVersion="$(curl -fsSL 'https://static.rust-lang.org/dist/channel-rust-stable.toml' | grep -E '^(\[|(version|(xz_)?(url|hash|available))[[:space:]]*=)')"
+rustVersion="$(curl -fsSL 'https://static.rust-lang.org/dist/channel-rust-beta.toml' | grep -E '^(\[|(version|(xz_)?(url|hash|available))[[:space:]]*=)')"
 rustVersion="$(awk <<<"$rustVersion" -F "[ ='\"]+" '
 	/^\[/ { pkg = $0; next }
 	pkg == "[pkg.rust]" && $1 == "version" { print $2; exit }
