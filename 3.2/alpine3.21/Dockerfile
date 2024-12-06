@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.19
+FROM alpine:3.21
 
 RUN set -eux; \
 	apk add --no-cache \
@@ -27,10 +27,10 @@ RUN set -eux; \
 
 ENV LANG C.UTF-8
 
-# https://www.ruby-lang.org/en/news/2024/09/03/3-3-5-released/
-ENV RUBY_VERSION 3.3.5
-ENV RUBY_DOWNLOAD_URL https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.5.tar.xz
-ENV RUBY_DOWNLOAD_SHA256 51aec7ea89b46125a2c9adc6f36766b65023d47952b916b1aed300ddcc042359
+# https://www.ruby-lang.org/en/news/2024/10/30/ruby-3-2-6-released/
+ENV RUBY_VERSION 3.2.6
+ENV RUBY_DOWNLOAD_URL https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.6.tar.xz
+ENV RUBY_DOWNLOAD_SHA256 671134022238c2c4a9d79dc7d1e58c909634197617901d25863642f735a27ecb
 
 # some of ruby's build scripts are written in ruby
 #   we purge system ruby later to make sure our final image uses what we just built
@@ -38,6 +38,7 @@ RUN set -eux; \
 	\
 	apk add --no-cache --virtual .ruby-builddeps \
 		autoconf \
+		bison \
 		bzip2 \
 		bzip2-dev \
 		ca-certificates \
@@ -58,6 +59,7 @@ RUN set -eux; \
 		openssl-dev \
 		patch \
 		procps \
+		readline-dev \
 		ruby \
 		tar \
 		xz \
@@ -103,9 +105,6 @@ RUN set -eux; \
 	echo '3ab628a51d92fdf0d2b5835e93564857aea73e0c1de00313864a94a6255cb645 *thread-stack-fix.patch' | sha256sum --check --strict; \
 	patch -p1 -i thread-stack-fix.patch; \
 	rm thread-stack-fix.patch; \
-	\
-# the configure script does not detect isnan/isinf as macros
-	export ac_cv_func_isnan=yes ac_cv_func_isinf=yes; \
 	\
 # hack in "ENABLE_PATH_CHECK" disabling to suppress:
 #   warning: Insecure world writable dir
