@@ -26,19 +26,9 @@ jobs:
       images: ${{ steps.fetch-matrix.outputs.images }}
       variants: ${{ steps.fetch-variants.outputs.variants }}
       json: ${{ steps.fetch-json.outputs.json }}
+      revision: ${{ steps.fetch-revision.outputs.revision }}
     steps:
       - uses: actions/checkout@v4
-      - id: fetch-variants
-        run: echo "variants=$(./variants.rb)" >> "$GITHUB_OUTPUT"
-      - id: fetch-json
-        run: echo "json=$(./nightly-versions.rb)" >> "$GITHUB_OUTPUT"
-      - id: fetch-date
-        run: echo "date=$(jq -r .master.date versions.json)" >> $GITHUB_OUTPUT
-      - run: ./apply-templates.sh
-
-      - id: fetch-matrix
-        run: echo "images=$(./images.rb)" >> "$GITHUB_OUTPUT"
-
       - name: Download source
         run: curl -o ruby.tar.xz https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.tar.xz
       - uses: actions/upload-artifact@v4
@@ -46,6 +36,20 @@ jobs:
           name: snapshot-master
           path: ruby.tar.xz
           retention-days: 1
+
+      - id: fetch-variants
+        run: echo "variants=$(./variants.rb)" >> "$GITHUB_OUTPUT"
+      - id: fetch-json
+        run: echo "json=$(./nightly-versions.rb)" >> "$GITHUB_OUTPUT"
+      - id: fetch-date
+        run: echo "date=$(jq -r .master.date versions.json)" >> $GITHUB_OUTPUT
+      - id: fetch-revision
+        run: echo revision=$(tar -xf ruby.tar.xz snapshot-master/revision.h -O | grep -oP '(?<=RUBY_REVISION ")(.*)(?=")') >> $GITHUB_OUTPUT
+      - run: ./apply-templates.sh
+
+      - id: fetch-matrix
+        run: echo "images=$(./images.rb)" >> "$GITHUB_OUTPUT"
+
 
   build:
     needs: set-up-matrix
@@ -194,9 +198,11 @@ jobs:
 
       - name: Create release notes
         run: |
-          echo "https://github.com/docker-ruby-nightly/ruby/pkgs/container/ruby/versions?filters[version_type]=tagged" > notes.txt
+          echo "Build from [${{ needs.set-up-matrix.outputs.revision }}](https://github.com/ruby/ruby/tree/${{ needs.set-up-matrix.outputs.revision }})" > notes.txt
           echo "" >> notes.txt
           cat $(find outcome/* | sort) >> notes.txt
+          echo "" >> notes.txt
+          echo "https://github.com/docker-ruby-nightly/ruby/pkgs/container/ruby/versions?filters[version_type]=tagged" >> notes.txt
 
       - id: latest-release
         env:
