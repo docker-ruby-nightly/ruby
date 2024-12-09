@@ -47,7 +47,7 @@ jobs:
         run: echo "date=$(jq -r .master.date docker-ruby/versions.json)" >> $GITHUB_OUTPUT
       - id: fetch-revision
         run: echo revision=$(tar -xf ruby.tar.xz snapshot-master/revision.h -O | grep -oP '(?<=RUBY_REVISION ")(.*)(?=")') >> $GITHUB_OUTPUT
-      - run: ./docker-ruby/apply-templates.sh
+      - run: cd docker-ruby && ./apply-templates.sh
 
       - id: fetch-matrix
         run: echo "images=$(./images.rb)" >> "$GITHUB_OUTPUT"
@@ -67,7 +67,7 @@ jobs:
           submodules: true
       - run: echo '${{ needs.set-up-matrix.outputs.json }}' > docker-ruby/versions.json
       - run: cd docker-ruby && git apply ../Dockerfile.template.patch
-      - run: ./docker-ruby/apply-templates.sh
+      - run: cd docker-ruby && ./apply-templates.sh
 
       - name: Docker meta
         id: meta
@@ -213,4 +213,4 @@ jobs:
         # https://github.com/ruby/actions/actions/workflows/snapshot-master.yml
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create Test ruby.tar.xz --title="${{ needs.set-up-matrix.outputs.date }}" --notes-file=notes.txt
+        run: gh release create Test ruby.tar.xz --title="Test" --notes-file=notes.txt
