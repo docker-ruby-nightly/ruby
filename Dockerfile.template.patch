@@ -1,0 +1,36 @@
+diff --git a/Dockerfile.template b/Dockerfile.template
+index 3c17e98..d19d92e 100644
+--- a/Dockerfile.template
++++ b/Dockerfile.template
+@@ -55,7 +55,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
+ 
+ # some of ruby's build scripts are written in ruby
+ #   we purge system ruby later to make sure our final image uses what we just built
+-RUN set -eux; \
++RUN --mount=type=bind,source=ruby.tar.xz,target=ruby.tar.xz \
++	set -eux; \
+ 	\
+ {{ if is_alpine then ( -}}
+ 	apk add --no-cache --virtual .ruby-builddeps \
+@@ -194,12 +195,10 @@ RUN set -eux; \
+ 	fi; \
+ {{ ) else "" end -}}
+ 	\
+-	wget -O ruby.tar.xz "$RUBY_DOWNLOAD_URL"; \
+ 	echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum --check --strict; \
+ 	\
+ 	mkdir -p /usr/src/ruby; \
+ 	tar -xJf ruby.tar.xz -C /usr/src/ruby --strip-components=1; \
+-	rm ruby.tar.xz; \
+ 	\
+ 	cd /usr/src/ruby; \
+ 	\
+@@ -207,7 +206,7 @@ RUN set -eux; \
+ # https://github.com/docker-library/ruby/issues/196
+ # https://bugs.ruby-lang.org/issues/14387#note-13 (patch source)
+ # https://bugs.ruby-lang.org/issues/14387#note-16 ("Therefore ncopa's patch looks good for me in general." -- only breaks glibc which doesn't matter here)
+-	wget -O 'thread-stack-fix.patch' 'https://bugs.ruby-lang.org/attachments/download/7081/0001-thread_pthread.c-make-get_main_stack-portable-on-lin.patch'; \
++	wget -O 'thread-stack-fix.patch' 'https://raw.githubusercontent.com/docker-ruby-nightly/ruby/master/thread-stack-fix.patch'; \
+ 	echo '3ab628a51d92fdf0d2b5835e93564857aea73e0c1de00313864a94a6255cb645 *thread-stack-fix.patch' | sha256sum --check --strict; \
+ 	patch -p1 -i thread-stack-fix.patch; \
+ 	rm thread-stack-fix.patch; \
