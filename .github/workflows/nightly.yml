@@ -175,13 +175,6 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
 
-      - name: Create manifest list and push
-        if: github.event_name == 'schedule' || inputs.push == true
-        working-directory: /tmp/digests
-        run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
-
   release:
     runs-on: ubuntu-latest
     needs:
@@ -218,7 +211,6 @@ jobs:
 
       - name: Create release
         # https://github.com/ruby/actions/actions/workflows/snapshot-master.yml
-        if: (github.event_name == 'schedule' || inputs.push == true) && steps.latest-release.outputs.latest_release != needs.set-up-matrix.outputs.date
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create ${{ needs.set-up-matrix.outputs.date }} ruby.tar.xz --title="${{ needs.set-up-matrix.outputs.date }}" --notes-file=notes.txt
+        run: gh release create Test ruby.tar.xz --title="${{ needs.set-up-matrix.outputs.date }}" --notes-file=notes.txt
