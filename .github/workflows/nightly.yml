@@ -29,6 +29,8 @@ jobs:
       revision: ${{ steps.fetch-revision.outputs.revision }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Download source
         run: curl -o ruby.tar.xz https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.tar.xz
       - uses: actions/upload-artifact@v4
@@ -42,10 +44,10 @@ jobs:
       - id: fetch-json
         run: echo "json=$(./nightly-versions.rb)" >> "$GITHUB_OUTPUT"
       - id: fetch-date
-        run: echo "date=$(jq -r .master.date versions.json)" >> $GITHUB_OUTPUT
+        run: echo "date=$(jq -r .master.date docker-ruby/versions.json)" >> $GITHUB_OUTPUT
       - id: fetch-revision
         run: echo revision=$(tar -xf ruby.tar.xz snapshot-master/revision.h -O | grep -oP '(?<=RUBY_REVISION ")(.*)(?=")') >> $GITHUB_OUTPUT
-      - run: ./apply-templates.sh
+      - run: cd docker-ruby && ./apply-templates.sh
 
       - id: fetch-matrix
         run: echo "images=$(./images.rb)" >> "$GITHUB_OUTPUT"
@@ -61,8 +63,11 @@ jobs:
     name: ${{ matrix.image.variant }} - ${{ matrix.image.platform }}
     steps:
       - uses: actions/checkout@v4
-      - run: echo '${{ needs.set-up-matrix.outputs.json }}' > versions.json
-      - run: ./apply-templates.sh
+        with:
+          submodules: true
+      - run: echo '${{ needs.set-up-matrix.outputs.json }}' > docker-ruby/versions.json
+      - run: cd docker-ruby && git apply ../Dockerfile.template.patch
+      - run: cd docker-ruby && ./apply-templates.sh
 
       - name: Docker meta
         id: meta
@@ -89,13 +94,13 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: snapshot-master
-          path: ./master/${{ matrix.image.variant }}
+          path: ./docker-ruby/master/${{ matrix.image.variant }}
 
       - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: ./master/${{ matrix.image.variant }}
+          context: ./docker-ruby/master/${{ matrix.image.variant }}
           platforms: ${{ matrix.image.platform }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
 
@@ -187,6 +192,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/download-artifact@v4
         with:
           name: snapshot-master

@@ -3,7 +3,7 @@
 require "json"
 require "net/http"
 
-current_json = JSON.parse(File.read("versions.json"))
+current_json = JSON.parse(File.read("docker-ruby/versions.json"))
 latest_release = current_json.compact.keys.max_by(&:to_f)
 donor = current_json[latest_release]
 
@@ -23,4 +23,4 @@ result = { "master" => master }.to_json
 # For step output
 puts result
 # For apply-templates.sh
-File.write("versions.json", result)
+File.write("docker-ruby/versions.json", result)

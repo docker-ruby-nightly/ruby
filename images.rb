@@ -2,7 +2,7 @@
 
 require "json"
 
-json = JSON.parse(File.read("versions.json"))
+json = JSON.parse(File.read("docker-ruby/versions.json"))
 latest_release = json.compact.keys.max_by(&:to_f)
 variants = json[latest_release]["variants"]
 
@@ -17,7 +17,7 @@ variants = json[latest_release]["variants"]
 # ]
 images = variants.map do |variant|
   # debian:bullseye-slim
-  base_image = File.read("master/#{variant}/Dockerfile")[/FROM (.*)/, 1]
+  base_image = File.read("docker-ruby/master/#{variant}/Dockerfile")[/FROM (.*)/, 1]
   manifest_inspect = JSON.parse(`docker manifest inspect #{base_image}`)
 
   # ["linux/amd64", "linux/arm64/v8", "linux/386"]
