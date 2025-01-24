@@ -24,6 +24,7 @@ images = variants.map do |variant|
   platforms = manifest_inspect["manifests"].filter_map do |manifest|
     platform = manifest["platform"]
     next unless platform["os"] == "linux"
+    next unless platform["architecture"] == "arm64"
 
     optional_variant = "/#{platform['variant']}" if platform['variant']
     "#{platform['os']}/#{platform['architecture']}#{optional_variant}"
