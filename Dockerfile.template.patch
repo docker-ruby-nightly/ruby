@@ -1,8 +1,8 @@
 diff --git a/Dockerfile.template b/Dockerfile.template
-index 3c17e98..d19d92e 100644
+index 4a3fc4a..27e39b9 100644
 --- a/Dockerfile.template
 +++ b/Dockerfile.template
-@@ -55,7 +55,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
+@@ -36,7 +36,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
  
  # some of ruby's build scripts are written in ruby
  #   we purge system ruby later to make sure our final image uses what we just built
@@ -12,7 +12,23 @@ index 3c17e98..d19d92e 100644
  	\
  {{ if is_alpine then ( -}}
  	apk add --no-cache --virtual .ruby-builddeps \
-@@ -194,12 +195,10 @@ RUN set -eux; \
+@@ -52,6 +53,7 @@ RUN set -eux; \
+ 		dpkg-dev dpkg \
+ 		g++ \
+ 		gcc \
++		git \
+ 		gdbm-dev \
+ 		glib-dev \
+ 		gmp-dev \
+@@ -93,6 +95,7 @@ RUN set -eux; \
+ 		bzip2 \
+ 		g++ \
+ 		gcc \
++		git \
+ 		libbz2-dev \
+ 		libffi-dev \
+ 		libgdbm-compat-dev \
+@@ -183,12 +186,10 @@ RUN set -eux; \
  	fi; \
  {{ ) else "" end -}}
  	\
@@ -25,7 +41,7 @@ index 3c17e98..d19d92e 100644
  	\
  	cd /usr/src/ruby; \
  	\
-@@ -207,7 +206,7 @@ RUN set -eux; \
+@@ -196,7 +197,7 @@ RUN set -eux; \
  # https://github.com/docker-library/ruby/issues/196
  # https://bugs.ruby-lang.org/issues/14387#note-13 (patch source)
  # https://bugs.ruby-lang.org/issues/14387#note-16 ("Therefore ncopa's patch looks good for me in general." -- only breaks glibc which doesn't matter here)
