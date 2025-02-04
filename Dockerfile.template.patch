@@ -1,5 +1,5 @@
 diff --git a/Dockerfile.template b/Dockerfile.template
-index 4a3fc4a..27e39b9 100644
+index 4a3fc4a..515b104 100644
 --- a/Dockerfile.template
 +++ b/Dockerfile.template
 @@ -36,7 +36,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
@@ -20,14 +20,14 @@ index 4a3fc4a..27e39b9 100644
  		gdbm-dev \
  		glib-dev \
  		gmp-dev \
-@@ -93,6 +95,7 @@ RUN set -eux; \
- 		bzip2 \
- 		g++ \
- 		gcc \
+@@ -88,6 +90,7 @@ RUN set -eux; \
+ 		dpkg-dev \
+ 		libgdbm-dev \
+ 		ruby \
 +		git \
- 		libbz2-dev \
- 		libffi-dev \
- 		libgdbm-compat-dev \
+ {{ if is_slim then ( -}}
+ 		autoconf \
+ 		bzip2 \
 @@ -183,12 +186,10 @@ RUN set -eux; \
  	fi; \
  {{ ) else "" end -}}
