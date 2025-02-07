@@ -15,10 +15,7 @@ variants = json[latest_release]["variants"]
 #   { "variant": "alpine3.20", "platform": "linux/arm64/v8" },
 #   { "variant": "alpine3.20", "platform": "linux/386" }
 # ]
-images = variants.filter_map do |variant|
-  # Until irb releases a new version
-  next if variant.include?("bullseye")
-
+images = variants.map do |variant|
   # debian:bullseye-slim
   base_image = File.read("docker-ruby/master/#{variant}/Dockerfile")[/FROM (.*)/, 1]
   manifest_inspect = JSON.parse(`docker manifest inspect #{base_image}`)
