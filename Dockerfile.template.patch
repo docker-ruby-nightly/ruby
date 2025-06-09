@@ -1,5 +1,5 @@
 diff --git a/Dockerfile.template b/Dockerfile.template
-index 4a3fc4a..27e39b9 100644
+index 9f9a685..2a6530d 100644
 --- a/Dockerfile.template
 +++ b/Dockerfile.template
 @@ -36,7 +36,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
@@ -28,9 +28,9 @@ index 4a3fc4a..27e39b9 100644
  		libbz2-dev \
  		libffi-dev \
  		libgdbm-compat-dev \
-@@ -183,12 +186,10 @@ RUN set -eux; \
+@@ -181,12 +184,10 @@ RUN set -eux; \
+ 		cargo --version; \
  	fi; \
- {{ ) else "" end -}}
  	\
 -	wget -O ruby.tar.xz "$RUBY_DOWNLOAD_URL"; \
  	echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum --check --strict; \
@@ -41,7 +41,7 @@ index 4a3fc4a..27e39b9 100644
  	\
  	cd /usr/src/ruby; \
  	\
-@@ -196,7 +197,7 @@ RUN set -eux; \
+@@ -194,7 +195,7 @@ RUN set -eux; \
  # https://github.com/docker-library/ruby/issues/196
  # https://bugs.ruby-lang.org/issues/14387#note-13 (patch source)
  # https://bugs.ruby-lang.org/issues/14387#note-16 ("Therefore ncopa's patch looks good for me in general." -- only breaks glibc which doesn't matter here)
