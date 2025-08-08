@@ -1,5 +1,5 @@
 diff --git a/Dockerfile.template b/Dockerfile.template
-index 9f9a685..2a6530d 100644
+index 9f9a685..5134250 100644
 --- a/Dockerfile.template
 +++ b/Dockerfile.template
 @@ -36,7 +36,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
@@ -50,3 +50,11 @@ index 9f9a685..2a6530d 100644
  	echo '3ab628a51d92fdf0d2b5835e93564857aea73e0c1de00313864a94a6255cb645 *thread-stack-fix.patch' | sha256sum --check --strict; \
  	patch -p1 -i thread-stack-fix.patch; \
  	rm thread-stack-fix.patch; \
+@@ -203,6 +204,7 @@ RUN set -eux; \
+ 	autoconf; \
+ 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+ 	./configure \
++		cppflags="-DRUBY_DEBUG=1" \
+ 		--build="$gnuArch" \
+ 		--disable-install-doc \
+ 		--enable-shared \
