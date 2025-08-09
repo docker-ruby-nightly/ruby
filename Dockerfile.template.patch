@@ -1,5 +1,5 @@
 diff --git a/Dockerfile.template b/Dockerfile.template
-index 9f9a685..5134250 100644
+index 9f9a685..fb36a96 100644
 --- a/Dockerfile.template
 +++ b/Dockerfile.template
 @@ -36,7 +36,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
@@ -28,20 +28,26 @@ index 9f9a685..5134250 100644
  		libbz2-dev \
  		libffi-dev \
  		libgdbm-compat-dev \
-@@ -181,12 +184,10 @@ RUN set -eux; \
+@@ -180,29 +183,29 @@ RUN set -eux; \
+ 		rustc --version; \
  		cargo --version; \
  	fi; \
- 	\
+-	\
 -	wget -O ruby.tar.xz "$RUBY_DOWNLOAD_URL"; \
- 	echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum --check --strict; \
- 	\
- 	mkdir -p /usr/src/ruby; \
- 	tar -xJf ruby.tar.xz -C /usr/src/ruby --strip-components=1; \
+-	echo "$RUBY_DOWNLOAD_SHA256 *ruby.tar.xz" | sha256sum --check --strict; \
+-	\
+-	mkdir -p /usr/src/ruby; \
+-	tar -xJf ruby.tar.xz -C /usr/src/ruby --strip-components=1; \
 -	rm ruby.tar.xz; \
++	mkdir -p /usr/src; \
++	cd /usr/src; \
++	git clone https://github.com/ruby/ruby.git; \
  	\
  	cd /usr/src/ruby; \
++	git fetch origin pull/14161/head:testing; \
++	git switch testing; \
  	\
-@@ -194,7 +195,7 @@ RUN set -eux; \
+ {{ if is_alpine then ( -}}
  # https://github.com/docker-library/ruby/issues/196
  # https://bugs.ruby-lang.org/issues/14387#note-13 (patch source)
  # https://bugs.ruby-lang.org/issues/14387#note-16 ("Therefore ncopa's patch looks good for me in general." -- only breaks glibc which doesn't matter here)
@@ -50,8 +56,10 @@ index 9f9a685..5134250 100644
  	echo '3ab628a51d92fdf0d2b5835e93564857aea73e0c1de00313864a94a6255cb645 *thread-stack-fix.patch' | sha256sum --check --strict; \
  	patch -p1 -i thread-stack-fix.patch; \
  	rm thread-stack-fix.patch; \
-@@ -203,6 +204,7 @@ RUN set -eux; \
+ 	\
+ {{ ) else "" end -}}
  	autoconf; \
++	./autogen.sh; \
  	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
  	./configure \
 +		cppflags="-DRUBY_DEBUG=1" \
