@@ -28,7 +28,7 @@ jobs:
       json: ${{ steps.fetch-json.outputs.json }}
       revision: ${{ steps.fetch-revision.outputs.revision }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: true
       - name: Download source
@@ -62,7 +62,7 @@ jobs:
         image: ${{ fromJson(needs.set-up-matrix.outputs.images) }}
     name: ${{ matrix.image.variant }} - ${{ matrix.image.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: true
       - run: echo '${{ needs.set-up-matrix.outputs.json }}' > docker-ruby/versions.json
@@ -191,7 +191,7 @@ jobs:
     if: success() || failure()
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: true
       - uses: actions/download-artifact@v4
