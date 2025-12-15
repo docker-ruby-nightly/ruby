@@ -33,7 +33,7 @@ jobs:
           submodules: true
       - name: Download source
         run: curl -o ruby.tar.xz https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-master.tar.xz
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: snapshot-master
           path: ruby.tar.xz
@@ -119,7 +119,7 @@ jobs:
           echo "${{ steps.build.outcome == 'success' && '✅' || '❌' }} ${{ matrix.image.variant }}-$platform_safe" > outcome-${{ matrix.image.variant }}-$platform_safe.txt
 
       - name: Upload digest
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: digests-${{ matrix.image.variant }}-${{ env.platform_safe }}
           path: /tmp/digests/*
@@ -128,7 +128,7 @@ jobs:
 
       - name: Upload outcome
         if: success() || failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: outcome-${{ matrix.image.variant }}-${{ env.platform_safe }}
           path: outcome-${{ matrix.image.variant }}-${{ env.platform_safe }}.txt
