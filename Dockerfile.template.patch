@@ -1,5 +1,5 @@
 diff --git a/Dockerfile.template b/Dockerfile.template
-index c402e73..b5b520e 100644
+index c402e73..e157d2c 100644
 --- a/Dockerfile.template
 +++ b/Dockerfile.template
 @@ -42,7 +42,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
@@ -41,7 +41,7 @@ index c402e73..b5b520e 100644
  	\
  	cd /usr/src/ruby; \
  	\
-@@ -200,7 +201,22 @@ RUN set -eux; \
+@@ -200,7 +201,23 @@ RUN set -eux; \
  # https://github.com/docker-library/ruby/issues/196
  # https://bugs.ruby-lang.org/issues/14387#note-13 (patch source)
  # https://bugs.ruby-lang.org/issues/14387#note-16 ("Therefore ncopa's patch looks good for me in general." -- only breaks glibc which doesn't matter here)
@@ -62,10 +62,11 @@ index c402e73..b5b520e 100644
 +    wget -q -O - https://github.com/ruby/ruby/commit/9be01bc70dca0e727fe1f518ebae1f6f72405b84.patch | patch -p1 -R; \
 +    wget -q -O - https://github.com/ruby/ruby/commit/3c100019a4a1b0ef66db76ec3b14f63eac51dd4d.patch | patch -p1 -R; \
 +    wget -q -O - https://github.com/ruby/ruby/commit/91619f0230c0e5a95c796c1bd4f784c151e15614.patch | patch -p1 -R; \
++	wget -q -O - https://github.com/ruby/ruby/commit/ef583c93ebad9eb9cf988e35bfd8ee22fbedd2c0.patch | patch -p1 -R; \
  	echo '3ab628a51d92fdf0d2b5835e93564857aea73e0c1de00313864a94a6255cb645 *thread-stack-fix.patch' | sha256sum --check --strict; \
  	patch -p1 -i thread-stack-fix.patch; \
  	rm thread-stack-fix.patch; \
-@@ -209,6 +225,7 @@ RUN set -eux; \
+@@ -209,6 +226,7 @@ RUN set -eux; \
  	autoconf; \
  	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
  	./configure \
