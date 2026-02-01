@@ -15,8 +15,8 @@ variants = json[latest_release]["variants"]
 #   { "variant": "alpine3.20", "platform": "linux/arm64/v8" },
 #   { "variant": "alpine3.20", "platform": "linux/386" }
 # ]
-images = variants.map do |variant|
-  # debian:bullseye-slim
+images = variants.filter_map do |variant|
+  next unless variant == "bookworm"
   base_image = File.read("docker-ruby/master/#{variant}/Dockerfile")[/FROM (.*)/, 1]
   manifest_inspect = JSON.parse(`docker manifest inspect #{base_image}`)
 
@@ -24,6 +24,8 @@ images = variants.map do |variant|
   platforms = manifest_inspect["manifests"].filter_map do |manifest|
     platform = manifest["platform"]
     next unless platform["os"] == "linux"
+    next unless platform["architecture"] == "arm"
+    next unless platform['variant'] == "v7"
 
     optional_variant = "/#{platform['variant']}" if platform['variant']
     "#{platform['os']}/#{platform['architecture']}#{optional_variant}"
