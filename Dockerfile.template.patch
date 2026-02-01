@@ -1,8 +1,8 @@
 diff --git a/Dockerfile.template b/Dockerfile.template
-index 9f9a685..5134250 100644
+index c402e73..b5b520e 100644
 --- a/Dockerfile.template
 +++ b/Dockerfile.template
-@@ -36,7 +36,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
+@@ -42,7 +42,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
  
  # some of ruby's build scripts are written in ruby
  #   we purge system ruby later to make sure our final image uses what we just built
@@ -12,7 +12,7 @@ index 9f9a685..5134250 100644
  	\
  {{ if is_alpine then ( -}}
  	apk add --no-cache --virtual .ruby-builddeps \
-@@ -52,6 +53,7 @@ RUN set -eux; \
+@@ -58,6 +59,7 @@ RUN set -eux; \
  		dpkg-dev dpkg \
  		g++ \
  		gcc \
@@ -20,7 +20,7 @@ index 9f9a685..5134250 100644
  		gdbm-dev \
  		glib-dev \
  		gmp-dev \
-@@ -93,6 +95,7 @@ RUN set -eux; \
+@@ -99,6 +101,7 @@ RUN set -eux; \
  		bzip2 \
  		g++ \
  		gcc \
@@ -28,7 +28,7 @@ index 9f9a685..5134250 100644
  		libbz2-dev \
  		libffi-dev \
  		libgdbm-compat-dev \
-@@ -181,12 +184,10 @@ RUN set -eux; \
+@@ -187,12 +190,10 @@ RUN set -eux; \
  		cargo --version; \
  	fi; \
  	\
@@ -41,16 +41,31 @@ index 9f9a685..5134250 100644
  	\
  	cd /usr/src/ruby; \
  	\
-@@ -194,7 +195,7 @@ RUN set -eux; \
+@@ -200,7 +201,22 @@ RUN set -eux; \
  # https://github.com/docker-library/ruby/issues/196
  # https://bugs.ruby-lang.org/issues/14387#note-13 (patch source)
  # https://bugs.ruby-lang.org/issues/14387#note-16 ("Therefore ncopa's patch looks good for me in general." -- only breaks glibc which doesn't matter here)
 -	wget -O 'thread-stack-fix.patch' 'https://bugs.ruby-lang.org/attachments/download/7081/0001-thread_pthread.c-make-get_main_stack-portable-on-lin.patch'; \
 +	wget -O 'thread-stack-fix.patch' 'https://raw.githubusercontent.com/docker-ruby-nightly/ruby/master/thread-stack-fix.patch'; \
++    wget -q -O - https://github.com/ruby/ruby/commit/db52e98520349e2bfcd471a0c2f96d696a4f7498.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/54df6cddd79f0b04cfc3b2f33b9bb79897a4c78a.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/250fdd13c7a2e80bb4c58469dfc732e60a3a8b54.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/bcbc6ed57112e1e4ad76fb2db6c9c7b35685b890.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/0b4b30af9e09be12960ad1e9aff89b195b7c3734.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/9cc71cb9093caa7ee471def8aa8f0de596e366cf.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/a7d4a9df03f8b99432f7b1d58c3cd04dc639965c.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/50e987bdca0f160412b27b97c8ef49d28b8c515e.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/0584f9fb0951bee3ea2645bdba0af56a2b320ed3.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/050c00141c7e8fdded5355b4c31e971ae21403d0.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/4c1120b5fd67cdf15b8c790849e068851369852f.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/66fdb15abf47df006a7cd29f34f30bec516f37aa.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/9be01bc70dca0e727fe1f518ebae1f6f72405b84.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/3c100019a4a1b0ef66db76ec3b14f63eac51dd4d.patch | patch -p1 -R; \
++    wget -q -O - https://github.com/ruby/ruby/commit/91619f0230c0e5a95c796c1bd4f784c151e15614.patch | patch -p1 -R; \
  	echo '3ab628a51d92fdf0d2b5835e93564857aea73e0c1de00313864a94a6255cb645 *thread-stack-fix.patch' | sha256sum --check --strict; \
  	patch -p1 -i thread-stack-fix.patch; \
  	rm thread-stack-fix.patch; \
-@@ -203,6 +204,7 @@ RUN set -eux; \
+@@ -209,6 +225,7 @@ RUN set -eux; \
  	autoconf; \
  	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
  	./configure \
