@@ -26,7 +26,10 @@ images = variants.map do |variant|
     next unless platform["os"] == "linux"
 
     optional_variant = "/#{platform['variant']}" if platform['variant']
-    "#{platform['os']}/#{platform['architecture']}#{optional_variant}"
+    identifier = "#{platform['os']}/#{platform['architecture']}#{optional_variant}"
+    next if identifier == "linux/arm/v5" || identifier == "linux/arm/v7"
+
+    identifier
   end
 
   platforms.map { |platform| { variant: variant, platform: platform } }
