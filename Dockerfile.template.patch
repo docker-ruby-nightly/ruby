@@ -2,16 +2,14 @@ diff --git a/Dockerfile.template b/Dockerfile.template
 index 3f1eeeb..7be8868 100644
 --- a/Dockerfile.template
 +++ b/Dockerfile.template
-@@ -20,7 +20,8 @@ FROM buildpack-deps:{{ env.variant }}
- {{ ) end -}}
+@@ -42,5 +42,6 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
  
- {{ if is_slim then ( -}}
+ # some of ruby's build scripts are written in ruby
+ #   we purge system ruby later to make sure our final image uses what we just built
 -RUN set -eux; \
 +RUN --mount=type=bind,source=ruby.tar.xz,target=ruby.tar.xz \
 +  set -eux; \
- 	apt-get update; \
- 	apt-get install -y --no-install-recommends \
- 		ca-certificates \
+ 	\
 @@ -54,6 +55,7 @@ RUN set -eux; \
  		dpkg-dev dpkg \
  		g++ \
