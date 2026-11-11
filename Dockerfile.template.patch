@@ -1,18 +1,18 @@
 diff --git a/Dockerfile.template b/Dockerfile.template
-index 9f9a685..5134250 100644
+index 3f1eeeb..ad9c6ff 100644
 --- a/Dockerfile.template
 +++ b/Dockerfile.template
-@@ -36,7 +36,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
+@@ -42,7 +42,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
  
  # some of ruby's build scripts are written in ruby
  #   we purge system ruby later to make sure our final image uses what we just built
 -RUN set -eux; \
 +RUN --mount=type=bind,source=ruby.tar.xz,target=ruby.tar.xz \
-+	set -eux; \
++  set -eux; \
  	\
  {{ if is_alpine then ( -}}
  	apk add --no-cache --virtual .ruby-builddeps \
-@@ -52,6 +53,7 @@ RUN set -eux; \
+@@ -54,6 +55,7 @@ RUN set -eux; \
  		dpkg-dev dpkg \
  		g++ \
  		gcc \
@@ -20,7 +20,7 @@ index 9f9a685..5134250 100644
  		gdbm-dev \
  		glib-dev \
  		gmp-dev \
-@@ -93,6 +95,7 @@ RUN set -eux; \
+@@ -88,6 +90,7 @@ RUN set -eux; \
  		bzip2 \
  		g++ \
  		gcc \
@@ -28,7 +28,7 @@ index 9f9a685..5134250 100644
  		libbz2-dev \
  		libffi-dev \
  		libgdbm-compat-dev \
-@@ -181,12 +184,10 @@ RUN set -eux; \
+@@ -173,12 +176,10 @@ RUN set -eux; \
  		cargo --version; \
  	fi; \
  	\
@@ -41,7 +41,7 @@ index 9f9a685..5134250 100644
  	\
  	cd /usr/src/ruby; \
  	\
-@@ -194,7 +195,7 @@ RUN set -eux; \
+@@ -186,7 +187,7 @@ RUN set -eux; \
  # https://github.com/docker-library/ruby/issues/196
  # https://bugs.ruby-lang.org/issues/14387#note-13 (patch source)
  # https://bugs.ruby-lang.org/issues/14387#note-16 ("Therefore ncopa's patch looks good for me in general." -- only breaks glibc which doesn't matter here)
@@ -50,11 +50,11 @@ index 9f9a685..5134250 100644
  	echo '3ab628a51d92fdf0d2b5835e93564857aea73e0c1de00313864a94a6255cb645 *thread-stack-fix.patch' | sha256sum --check --strict; \
  	patch -p1 -i thread-stack-fix.patch; \
  	rm thread-stack-fix.patch; \
-@@ -203,6 +204,7 @@ RUN set -eux; \
- 	autoconf; \
- 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+@@ -199,6 +200,7 @@ RUN set -eux; \
+ # https://salsa.debian.org/ruby-team/ruby/-/blob/8a55ab83e2c1783d80d0117fecbda533ac75f3e3/debian/rules#L63-67 (Debian's "hardening=+bindnow" produces the same flags)
+ 	export LDFLAGS='-Wl,-z,relro -Wl,-z,now'; \
  	./configure \
-+		cppflags="-DRUBY_DEBUG=1" \
++	  cppflags="-DRUBY_DEBUG=1" \
  		--build="$gnuArch" \
  		--disable-install-doc \
  		--enable-shared \
