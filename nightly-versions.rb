@@ -16,6 +16,7 @@ master = donor.slice("variants", "rust", "rustup")
 master.merge!(
   "version" => "master",
   "date" => upstream["date"],
+  "post" => "",
   "url" => { "xz" => "file://#{ENV["GITHUB_WORKSPACE"]}/ruby.tar.xz" },
   "sha256" => { "xz" => upstream["sha256"]["xz"] },
 )
