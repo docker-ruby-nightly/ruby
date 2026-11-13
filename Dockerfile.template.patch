@@ -1,5 +1,5 @@
 diff --git a/Dockerfile.template b/Dockerfile.template
-index 3f1eeeb..ad9c6ff 100644
+index 2788e71..520477a 100644
 --- a/Dockerfile.template
 +++ b/Dockerfile.template
 @@ -42,7 +42,8 @@ ENV RUBY_DOWNLOAD_SHA256 {{ .sha256.xz }}
@@ -41,15 +41,6 @@ index 3f1eeeb..ad9c6ff 100644
  	\
  	cd /usr/src/ruby; \
  	\
-@@ -186,7 +187,7 @@ RUN set -eux; \
- # https://github.com/docker-library/ruby/issues/196
- # https://bugs.ruby-lang.org/issues/14387#note-13 (patch source)
- # https://bugs.ruby-lang.org/issues/14387#note-16 ("Therefore ncopa's patch looks good for me in general." -- only breaks glibc which doesn't matter here)
--	wget -O 'thread-stack-fix.patch' 'https://bugs.ruby-lang.org/attachments/download/7081/0001-thread_pthread.c-make-get_main_stack-portable-on-lin.patch'; \
-+	wget -O 'thread-stack-fix.patch' 'https://raw.githubusercontent.com/docker-ruby-nightly/ruby/master/thread-stack-fix.patch'; \
- 	echo '3ab628a51d92fdf0d2b5835e93564857aea73e0c1de00313864a94a6255cb645 *thread-stack-fix.patch' | sha256sum --check --strict; \
- 	patch -p1 -i thread-stack-fix.patch; \
- 	rm thread-stack-fix.patch; \
 @@ -199,6 +200,7 @@ RUN set -eux; \
  # https://salsa.debian.org/ruby-team/ruby/-/blob/8a55ab83e2c1783d80d0117fecbda533ac75f3e3/debian/rules#L63-67 (Debian's "hardening=+bindnow" produces the same flags)
  	export LDFLAGS='-Wl,-z,relro -Wl,-z,now'; \
